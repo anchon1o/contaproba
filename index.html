@@ -50,12 +50,10 @@
       transition: background 0.2s, color 0.2s;
     }
 
-    /* Estilo colorido */
     .colorida.ben     { background: #a8e6a1; color: black; }
     .colorida.regular { background: #ffe58a; color: black; }
     .colorida.mal     { background: #ff9c9c; color: black; }
 
-    /* Estilo discreto */
     .discreta         { background: white; color: #444; }
     .discreta.ben span.valor     { color: #2e7d32; }
     .discreta.regular span.valor { color: #f9a825; }
@@ -68,25 +66,27 @@
     #resultado-container {
       display: none;
       margin-top: 35px;
+      max-width: 100%;
     }
 
     #resultado-container table {
       border-collapse: collapse;
-      width: 100%;
       text-align: center;
       table-layout: fixed;
+      width: calc(5 * 8.4vw + 4 * 3px);
+      margin: 0 auto;
     }
 
     #resultado-container td {
-      padding: 3px 1px;
-      font-size: 11px;
+      padding: 2px 0;
+      font-size: 10px;
       font-weight: normal;
-      max-width: 18vw;
+      width: 8.4vw;
     }
-    
+
     #valor-final {
-      font-weight: 600;
-      font-size: 12px;
+      font-weight: bold;
+      font-size: 13px;
     }
   </style>
 </head>
