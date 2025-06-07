@@ -169,14 +169,14 @@
             div.className = `pestanya ${modo} ben`;
             div.dataset.estado = 'ben';
             div.dataset.numero = i;
-            div.innerHTML = `<div>${i}</div><span class="valor">${simbolos.ben}</span>`;
+            div.innerHTML = `<div>${i}</div><span class="valor">${simbolos['ben']}</span>`;
             div.addEventListener('click', () => cambiarEstado(div));
           }
         } else {
           div.className = `pestanya ${modo} ben`;
           div.dataset.estado = 'ben';
           div.dataset.numero = i;
-          div.innerHTML = `<div>${i}</div><span class="valor">${simbolos[ben]}</span>`;
+          div.innerHTML = `<div>${i}</div><span class="valor">${simbolos['ben']}</span>`;
           div.addEventListener('click', () => cambiarEstado(div));
         }
 
@@ -211,7 +211,7 @@
           div.dataset.estado = 'ben';
           const num = div.dataset.numero;
           div.className = `pestanya ${modo} ben`;
-          div.innerHTML = `<div>${num}</div><span class="valor">${simbolos.ben}</span>`;
+          div.innerHTML = `<div>${num}</div><span class="valor">${simbolos['ben']}</span>`;
         }
       });
       actualizarResultado();
