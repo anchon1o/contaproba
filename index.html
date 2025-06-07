@@ -7,15 +7,20 @@
   <style>
     body {
       font-family: "Segoe UI", system-ui, sans-serif;
-      padding: 15px;
+      padding: 10px;
       background: #f0f0f0;
       margin: 0;
     }
 
     h1 {
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
       font-size: 20px;
+    }
+
+    .modo-selector {
+      text-align: center;
+      margin-bottom: 20px;
     }
 
     .grupo {
@@ -29,20 +34,12 @@
 
     .pestanyas {
       display: grid;
-      gap: 6px;
-    }
-
-    #grupo1-items, #grupo2-items {
       grid-template-columns: repeat(10, 1fr);
-    }
-
-    #grupo3-items {
-      grid-template-columns: repeat(5, 1fr);
+      gap: 4px;
     }
 
     .pestanya {
       aspect-ratio: 1 / 1;
-      background: #a8e6a1;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -50,35 +47,54 @@
       font-weight: 600;
       font-size: 13px;
       cursor: pointer;
-      border-radius: 6px;
+      border-radius: 5px;
       user-select: none;
       white-space: pre-line;
-      transition: background 0.2s;
+      transition: background 0.2s, color 0.2s;
+      border: 1px solid #ccc;
     }
 
-    .regular { background: #ffe58a; }
-    .mal { background: #ff9c9c; }
+    /* Versión 1: Colorida por fondo */
+    .colorida.ben     { background: #a8e6a1; color: black; }
+    .colorida.regular { background: #ffe58a; color: black; }
+    .colorida.mal     { background: #ff9c9c; color: black; }
+
+    /* Versión 2: Discreta, texto coloreado */
+    .discreta         { background: white; color: #444; }
+    .discreta.ben span.valor     { color: #2e7d32; }
+    .discreta.regular span.valor { color: #f9a825; }
+    .discreta.mal span.valor     { color: #c62828; }
 
     .reset-btn {
       display: block;
-      margin: 15px auto 0;
-      padding: 8px 16px;
-      font-size: 15px;
-      background-color: #444;
+      margin: 20px auto 0;
+      padding: 6px 14px;
+      font-size: 13px;
+      background-color: #888;
       color: white;
       border: none;
-      border-radius: 6px;
+      border-radius: 20px;
       cursor: pointer;
+      opacity: 0.5;
+      transition: opacity 0.2s, transform 0.2s;
     }
 
-    .reset-btn:hover {
-      background-color: #222;
+    .reset-btn:active {
+      opacity: 1;
+      transform: scale(1.1);
     }
   </style>
 </head>
 <body>
 
   <h1>Evaluación de Probas</h1>
+
+  <div class="modo-selector">
+    <label>
+      <input type="checkbox" id="modoToggle" />
+      Modo discreto
+    </label>
+  </div>
 
   <div class="grupo" id="grupo1">
     <h2>🥁 Ritmo</h2>
@@ -95,45 +111,66 @@
     <div class="pestanyas" id="grupo3-items"></div>
   </div>
 
-  <button class="reset-btn" onclick="resetear()">🔄 Reiniciar</button>
+  <button class="reset-btn" id="resetBtn">🔄 Manter para reiniciar</button>
 
   <script>
     const estados = ['ben', 'regular', 'mal'];
     const simbolos = { ben: '✔', regular: '-', mal: '✘' };
+    let modo = 'colorida';
 
     function crearPestanyas(grupoId, cantidad) {
-      const contenedor = document.getElementById(`${grupoId}-items`);
+      const contedor = document.getElementById(`${grupoId}-items`);
       for (let i = 1; i <= cantidad; i++) {
         const div = document.createElement('div');
-        div.className = 'pestanya ben';
-        div.innerText = `${i}\n✔`;
+        div.className = `pestanya ${modo} ben`;
         div.dataset.estado = 'ben';
         div.dataset.numero = i;
+        div.innerHTML = `<div>${i}</div><span class="valor">${simbolos.ben}</span>`;
 
         div.addEventListener('click', () => {
           let estadoActual = div.dataset.estado;
           let index = estados.indexOf(estadoActual);
           let novoEstado = estados[(index + 1) % estados.length];
           div.dataset.estado = novoEstado;
-          div.className = 'pestanya ' + novoEstado;
-          div.innerText = `${div.dataset.numero}\n${simbolos[novoEstado]}`;
+          div.className = `pestanya ${modo} ${novoEstado}`;
+          div.innerHTML = `<div>${div.dataset.numero}</div><span class="valor">${simbolos[novoEstado]}</span>`;
         });
 
-        contenedor.appendChild(div);
+        contedor.appendChild(div);
       }
     }
 
     function resetear() {
       document.querySelectorAll('.pestanya').forEach(div => {
         div.dataset.estado = 'ben';
-        div.className = 'pestanya ben';
-        div.innerText = `${div.dataset.numero}\n✔`;
+        div.className = `pestanya ${modo} ben`;
+        div.innerHTML = `<div>${div.dataset.numero}</div><span class="valor">${simbolos.ben}</span>`;
       });
     }
 
     crearPestanyas('grupo1', 10);
     crearPestanyas('grupo2', 10);
     crearPestanyas('grupo3', 5);
+
+    // Pulsación longa para reiniciar
+    let timer;
+    const btn = document.getElementById('resetBtn');
+    btn.addEventListener('mousedown', () => { timer = setTimeout(resetear, 1500); });
+    btn.addEventListener('mouseup', () => clearTimeout(timer));
+    btn.addEventListener('mouseleave', () => clearTimeout(timer));
+    btn.addEventListener('touchstart', () => { timer = setTimeout(resetear, 1500); });
+    btn.addEventListener('touchend', () => clearTimeout(timer));
+
+    // Alternar entre versións
+    document.getElementById('modoToggle').addEventListener('change', (e) => {
+      modo = e.target.checked ? 'discreta' : 'colorida';
+      document.querySelectorAll('.pestanya').forEach(div => {
+        const estado = div.dataset.estado;
+        const num = div.dataset.numero;
+        div.className = `pestanya ${modo} ${estado}`;
+        div.innerHTML = `<div>${num}</div><span class="valor">${simbolos[estado]}</span>`;
+      });
+    });
   </script>
 
 </body>
