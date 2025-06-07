@@ -64,6 +64,22 @@
     .especial {
       font-size: 22px;
     }
+
+    #resultado-container {
+      display: none;
+      margin-top: 20px;
+    }
+
+    #resultado-container table {
+      border-collapse: collapse;
+      width: 100%;
+      text-align: center;
+    }
+
+    #resultado-container td {
+      width: 20vw;
+      padding: 5px;
+    }
   </style>
 </head>
 <body>
@@ -85,6 +101,25 @@
     <div class="pestanyas" id="grupo3-items"></div>
   </div>
 
+  <div id="resultado-container">
+    <table>
+      <tr>
+        <td>🥁</td>
+        <td>🎵</td>
+        <td>👏</td>
+        <td>🧮</td>
+        <td>📊</td>
+      </tr>
+      <tr>
+        <td id="valor-ritmo"></td>
+        <td id="valor-entonacion"></td>
+        <td id="valor-psicomotriz"></td>
+        <td id="valor-total"></td>
+        <td id="valor-final"></td>
+      </tr>
+    </table>
+  </div>
+
   <script>
     const estados = ['ben', 'regular', 'mal'];
     const simbolos = { ben: '✔', regular: '-', mal: '✘' };
@@ -92,78 +127,70 @@
     let confirmarReinicio = false;
 
     function crearPestanyas(grupoId, cantidad, grupoNumero) {
-  const contedor = document.getElementById(`${grupoId}-items`);
-  for (let i = 1; i <= cantidad; i++) {
-    const div = document.createElement('div');
+      const contedor = document.getElementById(`${grupoId}-items`);
+      for (let i = 1; i <= cantidad; i++) {
+        const div = document.createElement('div');
 
-    if (grupoNumero === 3) {
-      if ([6, 7, 9].includes(i)) {
-        // Espazo baleiro
-        div.className = 'pestanya';
-        div.style.visibility = 'hidden';
-      } else if (i === 8) {
-        // Botón de cambio de modo
-        div.className = 'pestanya especial';
-        div.innerHTML = '🔘';
-        div.addEventListener('click', () => {
-          modo = (modo === 'colorida') ? 'discreta' : 'colorida';
-          actualizarEstilos();
-          div.innerHTML = (modo === 'colorida') ? '🔘' : '🚦';
-        });
-      } else if (i === 10) {
-        // Botón de reinicio con confirmación
-        div.className = 'pestanya especial';
-        div.innerHTML = '🔄';
-        div.addEventListener('click', () => {
-          if (!confirmarReinicio) {
-            div.innerHTML = '❓';
-            confirmarReinicio = true;
-            setTimeout(() => {
-              div.innerHTML = '🔄';
-              confirmarReinicio = false;
-            }, 2000);
-          } else {
-            resetear();
+        if (grupoNumero === 3) {
+          if ([6, 7].includes(i)) {
+            div.className = 'pestanya';
+            div.style.visibility = 'hidden';
+          } else if (i === 8) {
+            div.className = 'pestanya especial';
+            div.innerHTML = '🔘';
+            div.addEventListener('click', () => {
+              modo = (modo === 'colorida') ? 'discreta' : 'colorida';
+              actualizarEstilos();
+              div.innerHTML = (modo === 'colorida') ? '🔘' : '🚦';
+            });
+          } else if (i === 9) {
+            div.className = 'pestanya especial';
+            div.innerHTML = '📊';
+            div.addEventListener('click', toggleResultado);
+          } else if (i === 10) {
+            div.className = 'pestanya especial';
             div.innerHTML = '🔄';
-            confirmarReinicio = false;
+            div.addEventListener('click', () => {
+              if (!confirmarReinicio) {
+                div.innerHTML = '❓';
+                confirmarReinicio = true;
+                setTimeout(() => {
+                  div.innerHTML = '🔄';
+                  confirmarReinicio = false;
+                }, 2000);
+              } else {
+                resetear();
+                div.innerHTML = '🔄';
+                confirmarReinicio = false;
+              }
+            });
+          } else {
+            div.className = `pestanya ${modo} ben`;
+            div.dataset.estado = 'ben';
+            div.dataset.numero = i;
+            div.innerHTML = `<div>${i}</div><span class="valor">${simbolos.ben}</span>`;
+            div.addEventListener('click', () => cambiarEstado(div));
           }
-        });
-      } else {
-        // Botóns normais 1 a 5
-        div.className = `pestanya ${modo} ben`;
-        div.dataset.estado = 'ben';
-        div.dataset.numero = i;
-        div.innerHTML = `<div>${i}</div><span class="valor">${simbolos.ben}</span>`;
+        } else {
+          div.className = `pestanya ${modo} ben`;
+          div.dataset.estado = 'ben';
+          div.dataset.numero = i;
+          div.innerHTML = `<div>${i}</div><span class="valor">${simbolos.ben}</span>`;
+          div.addEventListener('click', () => cambiarEstado(div));
+        }
 
-        div.addEventListener('click', () => {
-          let estadoActual = div.dataset.estado;
-          let index = estados.indexOf(estadoActual);
-          let novoEstado = estados[(index + 1) % estados.length];
-          div.dataset.estado = novoEstado;
-          div.className = `pestanya ${modo} ${novoEstado}`;
-          div.innerHTML = `<div>${div.dataset.numero}</div><span class="valor">${simbolos[novoEstado]}</span>`;
-        });
+        contedor.appendChild(div);
       }
-    } else {
-      // Grupo 1 e 2 normais
-      div.className = `pestanya ${modo} ben`;
-      div.dataset.estado = 'ben';
-      div.dataset.numero = i;
-      div.innerHTML = `<div>${i}</div><span class="valor">${simbolos.ben}</span>`;
-
-      div.addEventListener('click', () => {
-        let estadoActual = div.dataset.estado;
-        let index = estados.indexOf(estadoActual);
-        let novoEstado = estados[(index + 1) % estados.length];
-        div.dataset.estado = novoEstado;
-        div.className = `pestanya ${modo} ${novoEstado}`;
-        div.innerHTML = `<div>${div.dataset.numero}</div><span class="valor">${simbolos[novoEstado]}</span>`;
-      });
     }
 
-    contedor.appendChild(div);
-  }
-}
+    function cambiarEstado(div) {
+      let estadoActual = div.dataset.estado;
+      let index = estados.indexOf(estadoActual);
+      let novoEstado = estados[(index + 1) % estados.length];
+      div.dataset.estado = novoEstado;
+      div.className = `pestanya ${modo} ${novoEstado}`;
+      div.innerHTML = `<div>${div.dataset.numero}</div><span class="valor">${simbolos[novoEstado]}</span>`;
+    }
 
     function actualizarEstilos() {
       document.querySelectorAll('.pestanya').forEach(div => {
@@ -185,12 +212,44 @@
           div.innerHTML = `<div>${num}</div><span class="valor">${simbolos.ben}</span>`;
         }
       });
+      actualizarResultado();
+    }
+
+    function calcularValor(grupoId) {
+      let total = 0;
+      document.querySelectorAll(`#${grupoId}-items .pestanya`).forEach(div => {
+        const estado = div.dataset.estado;
+        if (estado === 'ben') total += 1;
+        else if (estado === 'regular') total += 0.5;
+      });
+      return total;
+    }
+
+    function actualizarResultado() {
+      const ritmo = calcularValor('grupo1');
+      const entonacion = calcularValor('grupo2');
+      const psico = calcularValor('grupo3');
+      const total = ritmo + entonacion + psico;
+      const final = Math.round(total * 0.4 * 10) / 10;
+
+      document.getElementById('valor-ritmo').textContent = ritmo;
+      document.getElementById('valor-entonacion').textContent = entonacion;
+      document.getElementById('valor-psicomotriz').textContent = psico;
+      document.getElementById('valor-total').textContent = total;
+      document.getElementById('valor-final').textContent = final;
+    }
+
+    function toggleResultado() {
+      const cont = document.getElementById("resultado-container");
+      const visible = cont.style.display === "block";
+      cont.style.display = visible ? "none" : "block";
+      if (!visible) actualizarResultado();
     }
 
     crearPestanyas('grupo1', 10, 1);
     crearPestanyas('grupo2', 10, 2);
-    crearPestanyas('grupo3', 10, 3); // Inclúe tamén os botóns especiais
-
+    crearPestanyas('grupo3', 10, 3);
   </script>
+
 </body>
 </html>
