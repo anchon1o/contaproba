@@ -145,11 +145,11 @@
             div.style.visibility = 'hidden';
           } else if (i === 8) {
             div.className = 'pestanya especial';
-            div.innerHTML = '🔘';
+            div.innerHTML = '🔲';
             div.addEventListener('click', () => {
               modo = (modo === 'colorida') ? 'discreta' : 'colorida';
               actualizarEstilos();
-              div.innerHTML = (modo === 'colorida') ? '🔘' : '🚦';
+              div.innerHTML = (modo === 'colorida') ? '🔲' : '🚦';
             });
           } else if (i === 9) {
             div.className = 'pestanya especial';
