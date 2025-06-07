@@ -10,9 +10,6 @@
       padding: 10px;
       background: #f0f0f0;
       margin: 0;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
     }
 
     h1 {
@@ -37,7 +34,7 @@
     }
 
     .pestanya {
-      width: 8.5vw;
+      width: 8.4vw;
       aspect-ratio: 1 / 1;
       font-size: 12px;
       font-weight: 600;
@@ -58,85 +55,14 @@
     .colorida.regular { background: #ffe58a; color: black; }
     .colorida.mal     { background: #ff9c9c; color: black; }
 
-    /* Estilo discreto con texto coloreado */
+    /* Estilo discreto */
     .discreta         { background: white; color: #444; }
     .discreta.ben span.valor     { color: #2e7d32; }
     .discreta.regular span.valor { color: #f9a825; }
     .discreta.mal span.valor     { color: #c62828; }
 
-    .control-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px;
-      margin-top: auto;
-    }
-
-    .switch-container {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 14px;
-    }
-
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 42px;
-      height: 22px;
-    }
-
-    .switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-color: #ccc;
-      border-radius: 22px;
-      transition: .4s;
-    }
-
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 16px;
-      width: 16px;
-      left: 3px;
-      bottom: 3px;
-      background-color: white;
-      border-radius: 50%;
-      transition: .4s;
-    }
-
-    input:checked + .slider {
-      background-color: #4caf50;
-    }
-
-    input:checked + .slider:before {
-      transform: translateX(20px);
-    }
-
-    .reset-btn {
-      padding: 6px 14px;
-      font-size: 13px;
-      background-color: #888;
-      color: white;
-      border: none;
-      border-radius: 20px;
-      cursor: pointer;
-      opacity: 0.5;
-      user-select: none;
-      touch-action: manipulation;
-    }
-
-    .reset-btn:active {
-      opacity: 1;
-      transform: scale(1.1);
+    .especial {
+      font-size: 22px;
     }
   </style>
 </head>
@@ -159,88 +85,91 @@
     <div class="pestanyas" id="grupo3-items"></div>
   </div>
 
-  <div class="control-bar">
-    <div class="switch-container">
-      <label for="modoToggle">Modo discreto</label>
-      <label class="switch">
-        <input type="checkbox" id="modoToggle" />
-        <span class="slider"></span>
-      </label>
-    </div>
-
-    <button class="reset-btn" id="resetBtn">🔄 Reiniciar</button>
-  </div>
-
   <script>
     const estados = ['ben', 'regular', 'mal'];
     const simbolos = { ben: '✔', regular: '-', mal: '✘' };
     let modo = 'colorida';
+    let confirmarReinicio = false;
 
-    function crearPestanyas(grupoId, cantidad) {
+    function crearPestanyas(grupoId, cantidad, grupoNumero) {
       const contedor = document.getElementById(`${grupoId}-items`);
       for (let i = 1; i <= cantidad; i++) {
         const div = document.createElement('div');
-        div.className = `pestanya ${modo} ben`;
-        div.dataset.estado = 'ben';
-        div.dataset.numero = i;
-        div.innerHTML = `<div>${i}</div><span class="valor">${simbolos.ben}</span>`;
 
-        div.addEventListener('click', () => {
-          let estadoActual = div.dataset.estado;
-          let index = estados.indexOf(estadoActual);
-          let novoEstado = estados[(index + 1) % estados.length];
-          div.dataset.estado = novoEstado;
-          div.className = `pestanya ${modo} ${novoEstado}`;
-          div.innerHTML = `<div>${div.dataset.numero}</div><span class="valor">${simbolos[novoEstado]}</span>`;
-        });
+        if (grupoNumero === 3 && i === 8) {
+          // Botón modo
+          div.className = 'pestanya especial';
+          div.innerHTML = '☑️';
+          div.addEventListener('click', () => {
+            modo = (modo === 'colorida') ? 'discreta' : 'colorida';
+            actualizarEstilos();
+            div.innerHTML = (modo === 'colorida') ? '☑️' : '🚦';
+          });
+        } else if (grupoNumero === 3 && i === 10) {
+          // Botón reinicio
+          div.className = 'pestanya especial';
+          div.innerHTML = '🔄';
+          div.addEventListener('click', () => {
+            if (!confirmarReinicio) {
+              div.innerHTML = '❓';
+              confirmarReinicio = true;
+              setTimeout(() => {
+                div.innerHTML = '🔄';
+                confirmarReinicio = false;
+              }, 2000);
+            } else {
+              resetear();
+              div.innerHTML = '🔄';
+              confirmarReinicio = false;
+            }
+          });
+        } else {
+          // Botón normal
+          div.className = `pestanya ${modo} ben`;
+          div.dataset.estado = 'ben';
+          div.dataset.numero = i;
+          div.innerHTML = `<div>${i}</div><span class="valor">${simbolos.ben}</span>`;
+
+          div.addEventListener('click', () => {
+            let estadoActual = div.dataset.estado;
+            let index = estados.indexOf(estadoActual);
+            let novoEstado = estados[(index + 1) % estados.length];
+            div.dataset.estado = novoEstado;
+            div.className = `pestanya ${modo} ${novoEstado}`;
+            div.innerHTML = `<div>${div.dataset.numero}</div><span class="valor">${simbolos[novoEstado]}</span>`;
+          });
+        }
 
         contedor.appendChild(div);
       }
     }
 
-    function resetear() {
+    function actualizarEstilos() {
       document.querySelectorAll('.pestanya').forEach(div => {
-        div.dataset.estado = 'ben';
-        div.className = `pestanya ${modo} ben`;
-        div.innerHTML = `<div>${div.dataset.numero}</div><span class="valor">${simbolos.ben}</span>`;
+        if (div.dataset.estado) {
+          const estado = div.dataset.estado;
+          const num = div.dataset.numero;
+          div.className = `pestanya ${modo} ${estado}`;
+          div.innerHTML = `<div>${num}</div><span class="valor">${simbolos[estado]}</span>`;
+        }
       });
     }
 
-    crearPestanyas('grupo1', 10);
-    crearPestanyas('grupo2', 10);
-    crearPestanyas('grupo3', 5);
-
-    // Alternar entre estilos
-    document.getElementById('modoToggle').addEventListener('change', (e) => {
-      modo = e.target.checked ? 'discreta' : 'colorida';
+    function resetear() {
       document.querySelectorAll('.pestanya').forEach(div => {
-        const estado = div.dataset.estado;
-        const num = div.dataset.numero;
-        div.className = `pestanya ${modo} ${estado}`;
-        div.innerHTML = `<div>${num}</div><span class="valor">${simbolos[estado]}</span>`;
+        if (div.dataset.estado) {
+          div.dataset.estado = 'ben';
+          const num = div.dataset.numero;
+          div.className = `pestanya ${modo} ben`;
+          div.innerHTML = `<div>${num}</div><span class="valor">${simbolos.ben}</span>`;
+        }
       });
-    });
+    }
 
-    // Dobre clic para reiniciar
-    let confirmacionActiva = false;
-    const btn = document.getElementById('resetBtn');
+    crearPestanyas('grupo1', 10, 1);
+    crearPestanyas('grupo2', 10, 2);
+    crearPestanyas('grupo3', 10, 3); // Inclúe tamén os botóns especiais
 
-    btn.addEventListener('click', () => {
-      if (!confirmacionActiva) {
-        btn.textContent = '❗ Confirmar';
-        confirmacionActiva = true;
-
-        setTimeout(() => {
-          btn.textContent = '🔄 Reiniciar';
-          confirmacionActiva = false;
-        }, 2000); // tempo límite para confirmar
-      } else {
-        resetear();
-        btn.textContent = '🔄 Reiniciar';
-        confirmacionActiva = false;
-      }
-    });
   </script>
-
 </body>
 </html>
