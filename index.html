@@ -37,7 +37,7 @@
     }
 
     .pestanya {
-      width: 9vw;
+      width: 8.6vw;
       aspect-ratio: 1 / 1;
       font-size: 12px;
       font-weight: 600;
@@ -210,18 +210,6 @@
     crearPestanyas('grupo2', 10);
     crearPestanyas('grupo3', 5);
 
-    // Pulsación longa para reiniciar
-    let timer;
-    const btn = document.getElementById('resetBtn');
-    const iniciar = () => { timer = setTimeout(resetear, 1500); };
-    const cancelar = () => clearTimeout(timer);
-
-    btn.addEventListener('mousedown', iniciar);
-    btn.addEventListener('mouseup', cancelar);
-    btn.addEventListener('mouseleave', cancelar);
-    btn.addEventListener('touchstart', iniciar);
-    btn.addEventListener('touchend', cancelar);
-
     // Alternar entre estilos
     document.getElementById('modoToggle').addEventListener('change', (e) => {
       modo = e.target.checked ? 'discreta' : 'colorida';
@@ -231,6 +219,26 @@
         div.className = `pestanya ${modo} ${estado}`;
         div.innerHTML = `<div>${num}</div><span class="valor">${simbolos[estado]}</span>`;
       });
+    });
+
+    // Dobre clic para reiniciar
+    let confirmacionActiva = false;
+    const btn = document.getElementById('resetBtn');
+
+    btn.addEventListener('click', () => {
+      if (!confirmacionActiva) {
+        btn.textContent = '❗ Toca de novo para confirmar';
+        confirmacionActiva = true;
+
+        setTimeout(() => {
+          btn.textContent = '🔄 Reiniciar';
+          confirmacionActiva = false;
+        }, 2000); // tempo límite para confirmar
+      } else {
+        resetear();
+        btn.textContent = '🔄 Reiniciar';
+        confirmacionActiva = false;
+      }
     });
   </script>
 
