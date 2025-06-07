@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Evaluación Visual</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      background: #f0f0f0;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .grupo {
+      margin-bottom: 40px;
+    }
+
+    .grupo h2 {
+      margin-bottom: 10px;
+      font-size: 20px;
+    }
+
+    .pestanyas {
+      display: grid;
+      gap: 10px;
+    }
+
+    #grupo1-items, #grupo2-items {
+      grid-template-columns: repeat(10, 60px);
+    }
+
+    #grupo3-items {
+      grid-template-columns: repeat(5, 60px);
+    }
+
+    .pestanya {
+      width: 60px;
+      height: 60px;
+      background: #a8e6a1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 18px;
+      cursor: pointer;
+      border-radius: 10px;
+      user-select: none;
+      white-space: pre-line;
+      transition: background 0.2s;
+    }
+
+    .regular { background: #ffe58a; }
+    .mal { background: #ff9c9c; }
+
+    .reset-btn {
+      display: block;
+      margin: 0 auto;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #555;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .reset-btn:hover {
+      background-color: #333;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Acceso 1ºGE</h1>
+
+  <div class="grupo" id="grupo1">
+    <h2>🥁 Test rítmico</h2>
+    <div class="pestanyas" id="grupo1-items"></div>
+  </div>
+
+  <div class="grupo" id="grupo2">
+    <h2>🎵 Test auditivo-vocal</h2>
+    <div class="pestanyas" id="grupo2-items"></div>
+  </div>
+
+  <div class="grupo" id="grupo3">
+    <h2>👏 Test psicomotriz</h2>
+    <div class="pestanyas" id="grupo3-items"></div>
+  </div>
+
+  <button class="reset-btn" onclick="resetear()">🔄 Resetear todo</button>
+
+  <script>
+    const estados = ['bien', 'regular', 'mal'];
+    const simbolos = { bien: '✔', regular: '~', mal: '✘' };
+
+    function crearPestanyas(grupoId, cantidad) {
+      const contenedor = document.getElementById(`${grupoId}-items`);
+      for (let i = 1; i <= cantidad; i++) {
+        const div = document.createElement('div');
+        div.className = 'pestanya bien';
+        div.innerText = `${i}\n✔`;
+        div.dataset.estado = 'bien';
+        div.dataset.numero = i;
+
+        div.addEventListener('click', () => {
+          let estadoActual = div.dataset.estado;
+          let index = estados.indexOf(estadoActual);
+          let nuevoEstado = estados[(index + 1) % estados.length];
+          div.dataset.estado = nuevoEstado;
+          div.className = 'pestanya ' + nuevoEstado;
+          div.innerText = `${div.dataset.numero}\n${simbolos[nuevoEstado]}`;
+        });
+
+        contenedor.appendChild(div);
+      }
+    }
+
+    function resetear() {
+      document.querySelectorAll('.pestanya').forEach(div => {
+        div.dataset.estado = 'bien';
+        div.className = 'pestanya bien';
+        div.innerText = `${div.dataset.numero}\n✔`;
+      });
+    }
+
+    crearPestanyas('grupo1', 10);
+    crearPestanyas('grupo2', 10);
+    crearPestanyas('grupo3', 5);
+  </script>
+
+</body>
+</html>
