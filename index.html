@@ -67,18 +67,19 @@
 
     #resultado-container {
       display: none;
-      margin-top: 20px;
+      margin-top: 35px;
     }
 
     #resultado-container table {
       border-collapse: collapse;
       width: 100%;
       text-align: center;
+      table-layout: fixed;
     }
 
     #resultado-container td {
-      width: 20vw;
-      padding: 5px;
+      padding: 4px 2px;
+      font-weight: 600;
     }
   </style>
 </head>
@@ -175,7 +176,7 @@
           div.className = `pestanya ${modo} ben`;
           div.dataset.estado = 'ben';
           div.dataset.numero = i;
-          div.innerHTML = `<div>${i}</div><span class="valor">${simbolos.ben}</span>`;
+          div.innerHTML = `<div>${i}</div><span class="valor">${simbolos[ben]}</span>`;
           div.addEventListener('click', () => cambiarEstado(div));
         }
 
@@ -190,6 +191,7 @@
       div.dataset.estado = novoEstado;
       div.className = `pestanya ${modo} ${novoEstado}`;
       div.innerHTML = `<div>${div.dataset.numero}</div><span class="valor">${simbolos[novoEstado]}</span>`;
+      actualizarResultado();
     }
 
     function actualizarEstilos() {
